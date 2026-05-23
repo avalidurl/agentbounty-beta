@@ -21,3 +21,5 @@ export const COPY = {
   badNetworkWarn:
     "Connected to the wrong network. The beta only operates on Base Sepolia (chain id 84532).",
 };
+
+export const TALLY_URL = "https://tally.so/r/68Wy4O";

@@ -1,11 +1,7 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { WalletGate } from "../components/WalletGate";
-import { CHAIN, COPY, SITE } from "../data/site";
-
-const tallyUrl =
-  import.meta.env.PUBLIC_TALLY_FORM_URL ??
-  "https://tally.so/r/REPLACE_WITH_FORM_ID";
+import { CHAIN, COPY, SITE, TALLY_URL } from "../data/site";
 ---
 <BaseLayout
   title="AgentBounty Beta"
@@ -25,7 +21,7 @@ const tallyUrl =
     <div class="card card-strong stack-sm" style="max-width: 640px">
       <WalletGate
         client:load
-        tallyUrl={tallyUrl}
+        tallyUrl={TALLY_URL}
         expectedChainIdHex={CHAIN.expectedHex}
         rejectionCta={COPY.rejectionCta}
         badNetworkWarn={COPY.badNetworkWarn}
