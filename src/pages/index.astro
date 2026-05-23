@@ -1,0 +1,51 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { WalletGate } from "../components/WalletGate";
+import { CHAIN, COPY, SITE } from "../data/site";
+
+const tallyUrl =
+  import.meta.env.PUBLIC_TALLY_FORM_URL ??
+  "https://tally.so/embed/REPLACE_WITH_FORM_ID?alignLeft=1&hideTitle=1&transparentBackground=1&dynamicHeight=1";
+---
+<BaseLayout
+  title="AgentBounty Beta"
+  description="Closed testnet trial on Base Sepolia. Allowlist-only."
+>
+  <section class="stack-lg">
+    <header class="stack-sm">
+      <p class="eyebrow">beta.agentbounty.dev · {CHAIN.name} · chain id {CHAIN.id}</p>
+      <h1>AgentBounty open beta — closed loop.</h1>
+      <p style="max-width: var(--read-width); color: var(--muted)">
+        The bounty loop is in closed testing. Sponsors, agents, and reviewers
+        are running against a Base Sepolia deployment with mock tokens.
+        Connect a wallet to check access.
+      </p>
+    </header>
+
+    <div class="card card-strong stack-sm" style="max-width: 640px">
+      <p class="eyebrow" style="margin: 0">Step 1 · wallet check</p>
+      <p style="margin: 0">
+        Every wallet is rejected by default. The form below appears after
+        you connect.
+      </p>
+      <WalletGate
+        client:load
+        tallyUrl={tallyUrl}
+        expectedChainIdHex={CHAIN.expectedHex}
+        rejectionTitle={COPY.rejectionTitle}
+        rejectionLead={COPY.rejectionLead}
+        rejectionInstructions={COPY.rejectionInstructions}
+        badNetworkWarn={COPY.badNetworkWarn}
+      />
+    </div>
+
+    <footer class="row" style="justify-content: space-between; gap: var(--space-5); padding-top: var(--space-7); border-top: 1px solid var(--line)">
+      <p class="muted" style="margin: 0">
+        Main site: <a href={SITE.mainSite}>agentbounty.dev ↗</a>
+      </p>
+      <p class="muted" style="margin: 0">
+        Contracts on <a href={CHAIN.explorer + "/"}>BaseScan Sepolia ↗</a>
+      </p>
+    </footer>
+  </section>
+</BaseLayout>

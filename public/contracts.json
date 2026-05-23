@@ -1,0 +1,16 @@
+{
+  "chainId": 84532,
+  "chainName": "Base Sepolia",
+  "deployedAt": null,
+  "deployer": null,
+  "addresses": {
+    "BountyEscrow": "0x0000000000000000000000000000000000000000",
+    "VerdictModule": "0x0000000000000000000000000000000000000000",
+    "SettlementModule": "0x0000000000000000000000000000000000000000",
+    "MockBOUNTY": "0x0000000000000000000000000000000000000000",
+    "USDC": "0x036CbD53842c5426634e7929541eC2318f3dCF7e"
+  },
+  "explorers": {
+    "basescan": "https://sepolia.basescan.org"
+  }
+}

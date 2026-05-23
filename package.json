@@ -1,0 +1,29 @@
+{
+  "name": "agentbounty-beta",
+  "version": "0.1.0",
+  "private": true,
+  "description": "AgentBounty closed-beta gate and Base Sepolia test app.",
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "check": "astro check"
+  },
+  "dependencies": {
+    "@astrojs/react": "^4.4.0",
+    "@astrojs/sitemap": "^3.4.1",
+    "astro": "^5.8.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "viem": "^2.50.4"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.4",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "typescript": "^5.8.3"
+  }
+}
