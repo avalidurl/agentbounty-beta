@@ -44,3 +44,6 @@ contracts/broadcast/
 contracts/lib/
 indexer/.ponder/
 indexer/data/
+
+.dev.vars*
+!.dev.vars.example
