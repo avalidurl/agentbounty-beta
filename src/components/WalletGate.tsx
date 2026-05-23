@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useState } from "react";
-import { TallyEmbed } from "./TallyEmbed";
 
 type GateStatus =
   | "idle"
@@ -11,9 +10,7 @@ type GateStatus =
 interface Props {
   tallyUrl: string;
   expectedChainIdHex: string;
-  rejectionTitle: string;
-  rejectionLead: string;
-  rejectionInstructions: string;
+  rejectionCta: string;
   badNetworkWarn: string;
 }
 
@@ -50,9 +47,7 @@ function shortAddr(a: string): string {
 export function WalletGate({
   tallyUrl,
   expectedChainIdHex,
-  rejectionTitle,
-  rejectionLead,
-  rejectionInstructions,
+  rejectionCta,
   badNetworkWarn,
 }: Props) {
   const [status, setStatus] = useState<GateStatus>("idle");
@@ -117,32 +112,29 @@ export function WalletGate({
 
   if (status === "rejected" && address) {
     return (
-      <div className="stack">
-        <div className="card stack-sm">
-          <span className="tag tag-warn">access denied</span>
-          <h2 style={{ marginTop: 0, paddingTop: 0, borderTop: 0 }}>{rejectionTitle}</h2>
-          <p className="muted">
-            Connected wallet: <code>{shortAddr(address)}</code> — not in the allowlist.
-          </p>
-          <p>{rejectionLead}</p>
-          <p>{rejectionInstructions}</p>
-        </div>
-        <div className="card card-strong">
-          <p className="eyebrow" style={{ margin: 0 }}>Access request form</p>
-          <TallyEmbed url={tallyUrl} title="AgentBounty beta access request" />
-        </div>
+      <div className="stack-sm">
+        <p className="muted" style={{ margin: 0 }}>
+          {shortAddr(address)} is not on the allowlist.
+        </p>
+        <a
+          className="button button-primary"
+          href={tallyUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {rejectionCta}
+        </a>
       </div>
     );
   }
 
   if (status === "wrong-network" && address) {
     return (
-      <div className="card stack-sm">
-        <span className="tag tag-warn">wrong network</span>
-        <p className="muted">
-          Wallet <code>{shortAddr(address)}</code> is approved, but is connected to the wrong network.
+      <div className="stack-sm">
+        <p className="muted" style={{ margin: 0 }}>
+          {shortAddr(address)} is approved but on the wrong network.
         </p>
-        <p>{badNetworkWarn}</p>
+        <p style={{ margin: 0 }}>{badNetworkWarn}</p>
         <button className="button button-primary" onClick={connect}>
           Retry connection
         </button>

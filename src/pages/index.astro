@@ -5,7 +5,7 @@ import { CHAIN, COPY, SITE } from "../data/site";
 
 const tallyUrl =
   import.meta.env.PUBLIC_TALLY_FORM_URL ??
-  "https://tally.so/embed/REPLACE_WITH_FORM_ID?alignLeft=1&hideTitle=1&transparentBackground=1&dynamicHeight=1";
+  "https://tally.so/r/REPLACE_WITH_FORM_ID";
 ---
 <BaseLayout
   title="AgentBounty Beta"
@@ -23,18 +23,11 @@ const tallyUrl =
     </header>
 
     <div class="card card-strong stack-sm" style="max-width: 640px">
-      <p class="eyebrow" style="margin: 0">Step 1 · wallet check</p>
-      <p style="margin: 0">
-        Every wallet is rejected by default. The form below appears after
-        you connect.
-      </p>
       <WalletGate
         client:load
         tallyUrl={tallyUrl}
         expectedChainIdHex={CHAIN.expectedHex}
-        rejectionTitle={COPY.rejectionTitle}
-        rejectionLead={COPY.rejectionLead}
-        rejectionInstructions={COPY.rejectionInstructions}
+        rejectionCta={COPY.rejectionCta}
         badNetworkWarn={COPY.badNetworkWarn}
       />
     </div>

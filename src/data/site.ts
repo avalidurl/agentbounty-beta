@@ -16,11 +16,8 @@ export const CHAIN = {
 };
 
 export const COPY = {
-  rejectionTitle: "Wallet not approved for the beta",
-  rejectionLead:
-    "The AgentBounty bounty loop is in closed testing on Base Sepolia. Access is allowlist-only.",
-  rejectionInstructions:
-    "Fill in the form below to request access. Approved wallets will be added to the allowlist within 24 hours.",
+  rejectionTitle: "Request beta access",
+  rejectionCta: "Request beta access ↗",
   badNetworkWarn:
     "Connected to the wrong network. The beta only operates on Base Sepolia (chain id 84532).",
 };
