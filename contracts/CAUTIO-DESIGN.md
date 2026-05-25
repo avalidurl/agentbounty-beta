@@ -13,16 +13,31 @@ structs where relevant, gas budget, test plan). For now it pins the
 architecture decisions so that Phase 5 (BountyEscrow / VerdictModule /
 SettlementModule) can reference it without ambiguity.
 
+## CAUTIONER is the parametric insurance protocol
+
+CAUTIONER is **not** an access pass. It is **not** a governance ornament. It
+is the on-chain parametric insurance protocol that backs every settled
+bounty, every compute and oracle dependency, and the physical infrastructure
+under all of it.
+
+The CAUTIONER token is the on-chain instrument of that insurance. Holders
+absorb the loss when oracle-signed events fire (provider outage, datacenter
+incident, nat-cat, oracle silence, sponsor griefing, verdict failure). They
+are paid in protocol fees and Aave float yield in exchange for bearing that
+risk.
+
+The staking action — depositing BOUNTY or USDC into the Cautio pool — is
+itself the underwriting. There is no second layer of "stake CAUTIONER on
+top." Pool depositors **are** the underwriters. They receive CAUTIONER token
+emissions in exchange for the capital they put at risk, and they capture
+60% of all AgentBounty protocol fees.
+
 ## Tokens
 
 | Token | Spec | Role |
 |---|---|---|
 | **BOUNTY** | Existing ERC20 at `0x33e167FA22c9D78236b1a21C80E8B712205D1b07` on Base | Work currency. Submission bonds. Reviewer pay. Treasury spend. **Unchanged.** |
-| **CAUTIONER** | New ERC20, 100M total supply, capped, immutable. Deployed at TGE. | Airdrop receivers' on-token claim on the protocol. Tier-access pass to the Cautio pool entry windows. Future governance. **Tradable on Aerodrome / Uniswap.** |
-
-CAUTIONER is **NOT** the deposit asset for the Cautio pool. It is the access
-+ governance token that gets airdropped, sold, and traded. The pool itself
-takes BOUNTY or USDC as deposit (per the schedule on /staking).
+| **CAUTIONER** | New ERC20, 100M total supply, capped, immutable. The on-chain instrument of AgentBounty's parametric insurance protocol. | Airdropped to BOUNTY holders + friendly communities at TGE (30% supply). Emitted to underwriting-pool depositors over 18 epochs (15% supply). Captures 60% of protocol fees. Tradable on Aerodrome / Uniswap so the insurance position is liquid. When oracle-signed insurance triggers fire, the pool drains and CAUTIONER market price reflects the realized loss. |
 
 ## Cautio pool
 
@@ -70,10 +85,12 @@ asset, total pool capacity would be capped at ~100M tokens × CAUTIONER
 spot price. Underwriting capacity is the protocol's most important resource;
 gating it behind a fixed token would hard-cap the protocol's growth.
 
-Accepting USDC as a deposit asset means the pool can absorb capital at
-whatever rate AgentBounty's bounty volume demands. CAUTIONER then plays its
-proper role: a tradable claim on the protocol's value, with tier-access
-benefits to the highest-leverage entry windows.
+Accepting BOUNTY or USDC as the deposit asset means the pool can absorb
+capital at whatever rate AgentBounty's bounty volume demands. CAUTIONER is
+not the deposit asset — it is the **token of the insurance position**:
+emitted to depositors as their underwriting reward, freely tradable so the
+position can be priced and exited, value-capturing because it earns 60% of
+all protocol fees.
 
 ## Fee routing (60 / 25 / 15)
 
