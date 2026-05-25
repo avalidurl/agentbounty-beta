@@ -41,6 +41,11 @@ tmp/
 contracts/cache/
 contracts/out/
 contracts/broadcast/
-contracts/lib/
+# contracts/lib/ contents are managed as git submodules; .gitmodules tracks the
+# refs and submodule add fails if lib/ is ignored. Submodule clones still keep
+# their own working trees out of the parent's history because git stores only
+# gitlinks for them.
 indexer/.ponder/
 indexer/data/
+
+public/announce/

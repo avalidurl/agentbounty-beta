@@ -1,0 +1,19 @@
+# Foundry artifacts
+cache/
+out/
+docs/
+
+# Broadcast logs — keep mainnet/testnet, ignore dry runs and local anvil
+!broadcast/
+broadcast/*/31337/
+broadcast/**/dry-run/
+
+# Local secrets — real values live in ~/.config/agent-secrets/agentbounty/.env
+.env
+.env.local
+.env.*.local
+
+# Editor / OS noise
+.DS_Store
+*.swp
+*.swo
