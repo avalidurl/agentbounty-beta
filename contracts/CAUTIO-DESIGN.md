@@ -29,15 +29,17 @@ risk.
 The staking action — depositing BOUNTY or USDC into the Cautio pool — is
 itself the underwriting. There is no second layer of "stake CAUTIONER on
 top." Pool depositors **are** the underwriters. They receive CAUTIONER token
-emissions in exchange for the capital they put at risk, and they capture
-60% of all AgentBounty protocol fees.
+emissions in exchange for the capital they put at risk, and they capture a
+share of AgentBounty protocol fees — **60% per the working schedule on
+`/staking`, marked "subject to change" on that page; the final number lands
+at Cautio deploy.**
 
 ## Tokens
 
 | Token | Spec | Role |
 |---|---|---|
 | **BOUNTY** | Existing ERC20 at `0x33e167FA22c9D78236b1a21C80E8B712205D1b07` on Base | Work currency. Submission bonds. Reviewer pay. Treasury spend. **Unchanged.** |
-| **CAUTIONER** | New ERC20, 100M total supply, capped, immutable. The on-chain instrument of AgentBounty's parametric insurance protocol. | Airdropped to BOUNTY holders + friendly communities at TGE (30% supply). Emitted to underwriting-pool depositors over 18 epochs (15% supply). Captures 60% of protocol fees. Tradable on Aerodrome / Uniswap so the insurance position is liquid. When oracle-signed insurance triggers fire, the pool drains and CAUTIONER market price reflects the realized loss. |
+| **CAUTIONER** | New ERC20, 100M total supply, capped, immutable. The on-chain instrument of AgentBounty's parametric insurance protocol. | Airdropped to BOUNTY holders + friendly communities at TGE (30% supply per working schedule). Emitted to underwriting-pool depositors over 18 epochs (15% supply per working schedule). Captures the staker share of protocol fees (60% per working schedule, **subject to ratification at deploy**). Tradable on Aerodrome / Uniswap so the insurance position is liquid. When oracle-signed insurance triggers fire, the pool drains and CAUTIONER market price reflects the realized loss. All allocation percentages source from `/staking` and are marked "subject to change" until launch. |
 
 ## Cautio pool
 
@@ -55,7 +57,7 @@ Cautio pool (USDC + BOUNTY underwriting capital)
    │   - lock-mature exit; no early withdrawal in v0.1
    │
    ├── yield: paid in USDC, harvested anytime
-   │   - 60% of protocol fees from BountyEscrow / SettlementModule
+   │   - staker share of protocol fees (60% per /staking working schedule)
    │   - Aave float yield on idle pool USDC
    │   - slashed reviewer-bond treasury cut
    │   - bootstrap subsidy (first 90 days, decaying linearly)
@@ -89,14 +91,18 @@ Accepting BOUNTY or USDC as the deposit asset means the pool can absorb
 capital at whatever rate AgentBounty's bounty volume demands. CAUTIONER is
 not the deposit asset — it is the **token of the insurance position**:
 emitted to depositors as their underwriting reward, freely tradable so the
-position can be priced and exited, value-capturing because it earns 60% of
-all protocol fees.
+position can be priced and exited, value-capturing because it earns the
+staker share of protocol fees (60% per the `/staking` working schedule;
+final ratio is ratified at deploy).
 
-## Fee routing (60 / 25 / 15)
+## Fee routing (working schedule: 60 / 25 / 15 — subject to ratification at deploy)
 
-Per the public schedule on /staking:
+Per the public schedule on `/staking`. The page itself marks every number on
+that table as "subject to change"; these are working numbers, not contract
+constants. The final split is ratified at Cautio deploy and may move during
+mechanism design.
 
-| Recipient | Share |
+| Recipient | Share (working) |
 |---|---|
 | CAUTIONER stakers (the Cautio pool) | 60% |
 | Team multisig (operational) | 25% |
