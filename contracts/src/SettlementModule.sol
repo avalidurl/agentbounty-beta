@@ -82,9 +82,12 @@ contract SettlementModule is AccessControl, ReentrancyGuard, ISettlementModule {
     function settle(uint256 bountyId) external nonReentrant {
         IBountyEscrow.Bounty memory b = bountyEscrow.getBounty(bountyId);
         if (b.state != IBountyEscrow.BountyState.Queued) revert WrongState();
-        if (block.timestamp < uint256(b.verdictedAt) + uint256(b.challengeWindow)) revert ChallengeWindowActive();
 
         (bool resolved, bool awardHunter) = bountyEscrow.disputeResolved(bountyId);
+        if (!resolved && block.timestamp < uint256(b.verdictedAt) + uint256(b.challengeWindow)) {
+            revert ChallengeWindowActive();
+        }
+
         bool refund = (resolved && !awardHunter) || b.winningSubmissionId == 0;
 
         if (refund) {

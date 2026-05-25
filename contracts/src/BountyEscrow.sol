@@ -235,7 +235,6 @@ contract BountyEscrow is AccessControl, Pausable, ReentrancyGuard, IBountyEscrow
         _disputeResolved[bountyId] = true;
         _disputeAwardHunter[bountyId] = awardHunter;
         b.state = BountyState.Queued;
-        b.verdictedAt = uint64(block.timestamp - b.challengeWindow);
 
         emit DisputeResolved(bountyId, awardHunter);
     }
