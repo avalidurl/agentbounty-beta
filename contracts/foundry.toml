@@ -18,6 +18,9 @@ remappings = [
 fs_permissions = [
     { access = "read-write", path = "./out" },
     { access = "read",       path = "./script/config" },
+    { access = "write",      path = "./out/deployment-84532.json" },
+    { access = "write",      path = "./out/deployment-8453.json" },
+    { access = "write",      path = "./out/deployment-31337.json" },
 ]
 
 [profile.ci]
