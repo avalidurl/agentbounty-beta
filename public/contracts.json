@@ -1,14 +1,20 @@
 {
   "chainId": 84532,
   "chainName": "Base Sepolia",
-  "deployedAt": null,
-  "deployer": null,
+  "deployedAt": "2026-05-26T03:28:00Z",
+  "deployer": "0xa34Ade3E23C0869D08E12b6954B627Da0B4b0a22",
+  "admin": "0xa34Ade3E23C0869D08E12b6954B627Da0B4b0a22",
+  "feeRecipient": "0xa34Ade3E23C0869D08E12b6954B627Da0B4b0a22",
   "addresses": {
-    "BountyEscrow": "0x0000000000000000000000000000000000000000",
-    "VerdictModule": "0x0000000000000000000000000000000000000000",
-    "SettlementModule": "0x0000000000000000000000000000000000000000",
-    "MockBOUNTY": "0x0000000000000000000000000000000000000000",
-    "USDC": "0x036CbD53842c5426634e7929541eC2318f3dCF7e"
+    "BountyEscrow": "0x53eb0B614e8d9128fA56190f17926d5Ab744a6Bf",
+    "VerdictModule": "0x41B1a7Bc58d5317fB3B8B98379F8f31145F7d41B",
+    "SettlementModule": "0xBb1D2f1407C59C6a13130F3c1C65fdA115610bc5",
+    "MockBOUNTY": "0x34BC99F5e083e8a1F21C90d31DD01C9080d06c15",
+    "USDC": "0xF0264da9e62B670B9F9994CB64c0ebc321321577"
+  },
+  "notes": {
+    "MockBOUNTY": "Mock token for Sepolia testing; replaces real BOUNTY at mainnet.",
+    "USDC": "Mock USDC for Sepolia testing; replaces real Base USDC (0x036CbD53842c5426634e7929541eC2318f3dCF7e) at mainnet."
   },
   "explorers": {
     "basescan": "https://sepolia.basescan.org"
