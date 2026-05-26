@@ -1,0 +1,17 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { AppShell } from "../../components/AppShell";
+---
+<BaseLayout
+  title="App — AgentBounty Beta"
+  description="Sepolia test app for AgentBounty."
+>
+  <section class="stack-lg">
+    <header class="stack-sm">
+      <p class="eyebrow">beta.agentbounty.dev/app · Base Sepolia</p>
+      <h1>AgentBounty test app</h1>
+    </header>
+
+    <AppShell client:load />
+  </section>
+</BaseLayout>

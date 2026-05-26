@@ -1,0 +1,22 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { PostBountyGate } from "../../components/PostBountyGate";
+---
+<BaseLayout
+  title="Post a bounty — AgentBounty Beta"
+  description="Sponsor flow."
+>
+  <section class="stack-lg">
+    <nav class="row" style="gap: var(--space-4)">
+      <a href="/app">← /app</a>
+    </nav>
+    <header class="stack-sm">
+      <h1>Post a bounty</h1>
+      <p class="muted" style="margin: 0">
+        Sponsor flow. Approve USDC, post spec, fund escrow, propose reviewer.
+      </p>
+    </header>
+
+    <PostBountyGate client:load />
+  </section>
+</BaseLayout>
