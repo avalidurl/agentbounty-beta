@@ -17,13 +17,13 @@ interface IBountyEscrow {
         address sponsor;
         address proposedReviewer;
         address assignedReviewer;
-        uint96  reviewerProposedAt;
+        uint96 reviewerProposedAt;
         uint256 payoutMax;
         uint256 baseBond;
-        uint64  reviewWindow;
-        uint64  challengeWindow;
-        uint64  fundedAt;
-        uint64  verdictedAt;
+        uint64 reviewWindow;
+        uint64 challengeWindow;
+        uint64 fundedAt;
+        uint64 verdictedAt;
         bytes32 specHash;
         BountyState state;
         uint256 winningSubmissionId;
@@ -33,11 +33,11 @@ interface IBountyEscrow {
     struct Submission {
         uint256 bountyId;
         address submitter;
-        uint64  submittedAt;
+        uint64 submittedAt;
         uint256 paidBond;
         bytes32 artifactHash;
         bytes32 evidenceHash;
-        bool    isSlashed;
+        bool isSlashed;
     }
 
     event BountyCreated(
@@ -75,17 +75,23 @@ interface IBountyEscrow {
     function createBounty(
         uint256 payoutMax,
         uint256 baseBond,
-        uint64  reviewWindow,
-        uint64  challengeWindow,
+        uint64 reviewWindow,
+        uint64 challengeWindow,
         bytes32 specHash,
         address proposedReviewer
     ) external returns (uint256 bountyId);
 
-    function fundBounty(uint256 bountyId) external;
+    function fundBounty(
+        uint256 bountyId
+    ) external;
 
-    function cancel(uint256 bountyId) external;
+    function cancel(
+        uint256 bountyId
+    ) external;
 
-    function refund(uint256 bountyId) external;
+    function refund(
+        uint256 bountyId
+    ) external;
 
     function submit(
         uint256 bountyId,
@@ -93,13 +99,23 @@ interface IBountyEscrow {
         bytes32 evidenceHash
     ) external returns (uint256 submissionId);
 
-    function dispute(uint256 bountyId) external;
+    function dispute(
+        uint256 bountyId
+    ) external;
 
-    function resolveDispute(uint256 bountyId, bool awardHunter) external;
+    function resolveDispute(
+        uint256 bountyId,
+        bool awardHunter
+    ) external;
 
-    function markAssigned(uint256 bountyId, address reviewer) external;
+    function markAssigned(
+        uint256 bountyId,
+        address reviewer
+    ) external;
 
-    function markRejectedAndPooled(uint256 bountyId) external;
+    function markRejectedAndPooled(
+        uint256 bountyId
+    ) external;
 
     function markVerdicted(
         uint256 bountyId,
@@ -108,31 +124,59 @@ interface IBountyEscrow {
         bytes32 evidenceAnchor
     ) external;
 
-    function markSettled(uint256 bountyId) external;
+    function markSettled(
+        uint256 bountyId
+    ) external;
 
-    function markClaimed(uint256 bountyId) external;
+    function markClaimed(
+        uint256 bountyId
+    ) external;
 
-    function markRefundedFromQueued(uint256 bountyId) external;
+    function markRefundedFromQueued(
+        uint256 bountyId
+    ) external;
 
-    function withdrawUSDC(address to, uint256 amount) external;
+    function withdrawUSDC(
+        address to,
+        uint256 amount
+    ) external;
 
-    function withdrawBounty(address to, uint256 amount) external;
+    function withdrawBounty(
+        address to,
+        uint256 amount
+    ) external;
 
-    function withdrawBountyToBurn(uint256 amount) external;
+    function withdrawBountyToBurn(
+        uint256 amount
+    ) external;
 
-    function getBounty(uint256 bountyId) external view returns (Bounty memory);
+    function getBounty(
+        uint256 bountyId
+    ) external view returns (Bounty memory);
 
-    function getSubmission(uint256 submissionId) external view returns (Submission memory);
+    function getSubmission(
+        uint256 submissionId
+    ) external view returns (Submission memory);
 
-    function getSubmissionIds(uint256 bountyId) external view returns (uint256[] memory);
+    function getSubmissionIds(
+        uint256 bountyId
+    ) external view returns (uint256[] memory);
 
-    function currentBondCost(uint256 bountyId) external view returns (uint256 totalCost, uint256 baseBond, uint256 burnAmount);
+    function currentBondCost(
+        uint256 bountyId
+    ) external view returns (uint256 totalCost, uint256 baseBond, uint256 burnAmount);
 
-    function bountyExists(uint256 bountyId) external view returns (bool);
+    function bountyExists(
+        uint256 bountyId
+    ) external view returns (bool);
 
-    function getCurrentMultiplierBps(uint256 bountyId) external view returns (uint256);
+    function getCurrentMultiplierBps(
+        uint256 bountyId
+    ) external view returns (uint256);
 
-    function disputeResolved(uint256 bountyId) external view returns (bool resolved, bool awardHunter);
+    function disputeResolved(
+        uint256 bountyId
+    ) external view returns (bool resolved, bool awardHunter);
 
     function REVIEWER_REJECT_WINDOW() external view returns (uint64);
 

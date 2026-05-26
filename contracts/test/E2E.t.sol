@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-import {BaseTest} from "./Base.t.sol";
-import {IBountyEscrow} from "../src/interfaces/IBountyEscrow.sol";
-import {IVerdictModule} from "../src/interfaces/IVerdictModule.sol";
+import { IBountyEscrow } from "../src/interfaces/IBountyEscrow.sol";
+import { IVerdictModule } from "../src/interfaces/IVerdictModule.sol";
+import { BaseTest } from "./Base.t.sol";
 
 contract E2ETest is BaseTest {
     function test_fullHappyPath_5submissions_winner3_slashed5() public {
@@ -36,14 +36,8 @@ contract E2ETest is BaseTest {
         uint256[] memory slashed = new uint256[](1);
         slashed[0] = sid5;
 
-        (IVerdictModule.Verdict memory v, bytes memory sig) = _signVerdict(
-            reviewerKey,
-            bountyId,
-            sid3,
-            slashed,
-            keccak256("citations+reasoning"),
-            0
-        );
+        (IVerdictModule.Verdict memory v, bytes memory sig) =
+            _signVerdict(reviewerKey, bountyId, sid3, slashed, keccak256("citations+reasoning"), 0);
         verdictModule.submitVerdict(v, sig);
 
         IBountyEscrow.Bounty memory bAfterVerdict = escrow.getBounty(bountyId);
@@ -73,8 +67,8 @@ contract E2ETest is BaseTest {
         assertEq(claimableTo, hunter3);
         assertEq(claimableAmt, 960 * 10 ** 6);
 
-        uint256 expectedSlashReviewer = (DEFAULT_BASE_BOND * 4_000) / 10_000;
-        uint256 expectedSlashTreasury = (DEFAULT_BASE_BOND * 3_000) / 10_000;
+        uint256 expectedSlashReviewer = (DEFAULT_BASE_BOND * 4000) / 10_000;
+        uint256 expectedSlashTreasury = (DEFAULT_BASE_BOND * 3000) / 10_000;
         uint256 expectedSlashBurn = DEFAULT_BASE_BOND - expectedSlashReviewer - expectedSlashTreasury;
 
         assertEq(bounty.balanceOf(reviewer) - reviewerBountyBefore, expectedSlashReviewer);
@@ -93,7 +87,9 @@ contract E2ETest is BaseTest {
         IBountyEscrow.Bounty memory bClaimed = escrow.getBounty(bountyId);
         assertEq(uint8(bClaimed.state), uint8(IBountyEscrow.BountyState.Claimed));
 
-        sid1; sid2; sid4;
+        sid1;
+        sid2;
+        sid4;
     }
 
     function test_e2e_poolClaim_afterReject() public {
@@ -111,9 +107,8 @@ contract E2ETest is BaseTest {
         uint256 sid = _submit(hunter1, bountyId);
 
         uint256[] memory slashed = new uint256[](0);
-        (IVerdictModule.Verdict memory v, bytes memory sig) = _signVerdict(
-            reviewerKey2, bountyId, sid, slashed, keccak256("a"), 0
-        );
+        (IVerdictModule.Verdict memory v, bytes memory sig) =
+            _signVerdict(reviewerKey2, bountyId, sid, slashed, keccak256("a"), 0);
         verdictModule.submitVerdict(v, sig);
 
         vm.warp(block.timestamp + DEFAULT_CHALLENGE_WINDOW + 1);
@@ -133,9 +128,8 @@ contract E2ETest is BaseTest {
         uint256 sid = _submit(hunter1, bountyId);
 
         uint256[] memory empty = new uint256[](0);
-        (IVerdictModule.Verdict memory v, bytes memory sig) = _signVerdict(
-            reviewerKey, bountyId, sid, empty, keccak256("a"), 0
-        );
+        (IVerdictModule.Verdict memory v, bytes memory sig) =
+            _signVerdict(reviewerKey, bountyId, sid, empty, keccak256("a"), 0);
         verdictModule.submitVerdict(v, sig);
 
         vm.prank(challenger);
@@ -166,9 +160,8 @@ contract E2ETest is BaseTest {
         uint256 sid = _submit(hunter1, bountyId);
 
         uint256[] memory empty = new uint256[](0);
-        (IVerdictModule.Verdict memory v, bytes memory sig) = _signVerdict(
-            reviewerKey, bountyId, sid, empty, keccak256("a"), 0
-        );
+        (IVerdictModule.Verdict memory v, bytes memory sig) =
+            _signVerdict(reviewerKey, bountyId, sid, empty, keccak256("a"), 0);
         verdictModule.submitVerdict(v, sig);
 
         vm.prank(challenger);

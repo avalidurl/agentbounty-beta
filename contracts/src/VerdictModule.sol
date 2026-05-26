@@ -1,15 +1,15 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-import {AccessControl} from "@openzeppelin/contracts/access/AccessControl.sol";
-import {EIP712} from "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
-import {ECDSA} from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
-import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import { AccessControl } from "@openzeppelin/contracts/access/AccessControl.sol";
+import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import { SafeERC20 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import { ReentrancyGuard } from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import { ECDSA } from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import { EIP712 } from "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
 
-import {IBountyEscrow} from "./interfaces/IBountyEscrow.sol";
-import {IVerdictModule} from "./interfaces/IVerdictModule.sol";
+import { IBountyEscrow } from "./interfaces/IBountyEscrow.sol";
+import { IVerdictModule } from "./interfaces/IVerdictModule.sol";
 
 /// @title VerdictModule
 /// @notice Reviewer registry, BOUNTY bond accounting, EIP-712 verdict signing,
@@ -26,15 +26,15 @@ contract VerdictModule is AccessControl, ReentrancyGuard, EIP712, IVerdictModule
     );
 
     uint256 public constant MIN_REVIEWER_BOND = 1_000_000 ether;
-    uint256 public constant BOND_RATIO_BPS    = 100;
-    uint256 public constant BPS_DENOMINATOR   = 10_000;
+    uint256 public constant BOND_RATIO_BPS = 100;
+    uint256 public constant BPS_DENOMINATOR = 10_000;
 
-    IERC20         public immutable BOUNTY;
-    IBountyEscrow  public immutable bountyEscrow;
+    IERC20 public immutable BOUNTY;
+    IBountyEscrow public immutable bountyEscrow;
 
     mapping(address => Reviewer) internal _reviewers;
-    mapping(address => uint256)  internal _reviewerNonces;
-    mapping(uint256 => address)  internal _bountyAssignedTo;
+    mapping(address => uint256) internal _reviewerNonces;
+    mapping(uint256 => address) internal _bountyAssignedTo;
 
     error NotRegistered();
     error AlreadyRegistered();
@@ -64,22 +64,23 @@ contract VerdictModule is AccessControl, ReentrancyGuard, EIP712, IVerdictModule
         _grantRole(REVIEWER_ADMIN_ROLE, admin);
     }
 
-    function registerReviewer(uint256 bountyBondAmount) external nonReentrant {
+    function registerReviewer(
+        uint256 bountyBondAmount
+    ) external nonReentrant {
         if (_reviewers[msg.sender].isRegistered) revert AlreadyRegistered();
         if (bountyBondAmount < MIN_REVIEWER_BOND) revert InsufficientBond();
 
         BOUNTY.safeTransferFrom(msg.sender, address(this), bountyBondAmount);
 
-        _reviewers[msg.sender] = Reviewer({
-            isRegistered: true,
-            lockedBond:   bountyBondAmount,
-            registeredAt: uint64(block.timestamp)
-        });
+        _reviewers[msg.sender] =
+            Reviewer({ isRegistered: true, lockedBond: bountyBondAmount, registeredAt: uint64(block.timestamp) });
 
         emit ReviewerRegistered(msg.sender, bountyBondAmount);
     }
 
-    function topUpBond(uint256 bountyBondAmount) external nonReentrant {
+    function topUpBond(
+        uint256 bountyBondAmount
+    ) external nonReentrant {
         Reviewer storage r = _reviewers[msg.sender];
         if (!r.isRegistered) revert NotRegistered();
 
@@ -102,7 +103,9 @@ contract VerdictModule is AccessControl, ReentrancyGuard, EIP712, IVerdictModule
         emit ReviewerUnregistered(msg.sender, toReturn);
     }
 
-    function acceptAssignment(uint256 bountyId) external nonReentrant {
+    function acceptAssignment(
+        uint256 bountyId
+    ) external nonReentrant {
         Reviewer storage r = _reviewers[msg.sender];
         if (!r.isRegistered) revert NotRegistered();
 
@@ -120,7 +123,9 @@ contract VerdictModule is AccessControl, ReentrancyGuard, EIP712, IVerdictModule
         emit AssignmentAccepted(bountyId, msg.sender);
     }
 
-    function rejectAssignment(uint256 bountyId) external {
+    function rejectAssignment(
+        uint256 bountyId
+    ) external {
         IBountyEscrow.Bounty memory b = bountyEscrow.getBounty(bountyId);
         if (b.proposedReviewer != msg.sender) revert NotProposedReviewer();
         if (b.state != IBountyEscrow.BountyState.Funded) revert WrongBountyState();
@@ -129,7 +134,9 @@ contract VerdictModule is AccessControl, ReentrancyGuard, EIP712, IVerdictModule
         emit AssignmentRejected(bountyId, msg.sender);
     }
 
-    function claimPoolBounty(uint256 bountyId) external nonReentrant {
+    function claimPoolBounty(
+        uint256 bountyId
+    ) external nonReentrant {
         Reviewer storage r = _reviewers[msg.sender];
         if (!r.isRegistered) revert NotRegistered();
 
@@ -137,8 +144,8 @@ contract VerdictModule is AccessControl, ReentrancyGuard, EIP712, IVerdictModule
         if (b.state != IBountyEscrow.BountyState.Funded) revert WrongBountyState();
         if (_bountyAssignedTo[bountyId] != address(0)) revert AssignmentAlreadyHeld();
 
-        bool windowExpired = block.timestamp >=
-            uint256(b.reviewerProposedAt) + uint256(bountyEscrow.REVIEWER_REJECT_WINDOW());
+        bool windowExpired =
+            block.timestamp >= uint256(b.reviewerProposedAt) + uint256(bountyEscrow.REVIEWER_REJECT_WINDOW());
         if (b.proposedReviewer != address(0) && !windowExpired) revert PoolNotOpen();
 
         uint256 required = requiredBondForBounty(b.payoutMax);
@@ -154,7 +161,10 @@ contract VerdictModule is AccessControl, ReentrancyGuard, EIP712, IVerdictModule
         emit PoolBountyClaimed(bountyId, msg.sender);
     }
 
-    function submitVerdict(Verdict calldata v, bytes calldata signature) external {
+    function submitVerdict(
+        Verdict calldata v,
+        bytes calldata signature
+    ) external {
         bytes32 structHash = keccak256(
             abi.encode(
                 VERDICT_TYPEHASH,
@@ -179,30 +189,34 @@ contract VerdictModule is AccessControl, ReentrancyGuard, EIP712, IVerdictModule
 
         _reviewerNonces[signer] = v.nonce + 1;
 
-        bountyEscrow.markVerdicted(
-            v.bountyId,
-            v.winningSubmissionId,
-            v.slashedSubmissionIds,
-            v.evidenceAnchor
-        );
+        bountyEscrow.markVerdicted(v.bountyId, v.winningSubmissionId, v.slashedSubmissionIds, v.evidenceAnchor);
 
         emit VerdictSubmitted(v.bountyId, signer, v.winningSubmissionId, v.slashedSubmissionIds.length);
     }
 
-    function requiredBondForBounty(uint256 payoutMax) public pure returns (uint256) {
+    function requiredBondForBounty(
+        uint256 payoutMax
+    ) public pure returns (uint256) {
         uint256 scaled = (payoutMax * BOND_RATIO_BPS) / BPS_DENOMINATOR;
         return scaled > MIN_REVIEWER_BOND ? scaled : MIN_REVIEWER_BOND;
     }
 
-    function getReviewer(address reviewer) external view returns (Reviewer memory) {
+    function getReviewer(
+        address reviewer
+    ) external view returns (Reviewer memory) {
         return _reviewers[reviewer];
     }
 
-    function reviewerNonce(address reviewer) external view returns (uint256) {
+    function reviewerNonce(
+        address reviewer
+    ) external view returns (uint256) {
         return _reviewerNonces[reviewer];
     }
 
-    function isAssigned(uint256 bountyId, address reviewer) external view returns (bool) {
+    function isAssigned(
+        uint256 bountyId,
+        address reviewer
+    ) external view returns (bool) {
         return _bountyAssignedTo[bountyId] == reviewer;
     }
 

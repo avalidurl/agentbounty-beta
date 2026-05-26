@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-import {Script, console} from "forge-std/Script.sol";
+import { Script, console } from "forge-std/Script.sol";
 
-import {MockBOUNTY} from "../src/MockBOUNTY.sol";
-import {MockUSDC} from "../src/MockUSDC.sol";
-import {BountyEscrow} from "../src/BountyEscrow.sol";
-import {VerdictModule} from "../src/VerdictModule.sol";
-import {SettlementModule} from "../src/SettlementModule.sol";
+import { BountyEscrow } from "../src/BountyEscrow.sol";
+import { MockBOUNTY } from "../src/MockBOUNTY.sol";
+import { MockUSDC } from "../src/MockUSDC.sol";
+import { SettlementModule } from "../src/SettlementModule.sol";
+import { VerdictModule } from "../src/VerdictModule.sol";
 
 /// @notice Deploys the full AgentBounty v0.1 contract suite.
 ///
@@ -82,7 +82,10 @@ contract DeployScript is Script {
         _writeJson(d);
     }
 
-    function _envAddressOr(string memory key, address fallbackAddr) internal view returns (address) {
+    function _envAddressOr(
+        string memory key,
+        address fallbackAddr
+    ) internal view returns (address) {
         try vm.envAddress(key) returns (address a) {
             return a;
         } catch {
@@ -90,31 +93,55 @@ contract DeployScript is Script {
         }
     }
 
-    function _logDeployment(Deployment memory d) internal pure {
+    function _logDeployment(
+        Deployment memory d
+    ) internal pure {
         console.log("--------- AgentBounty v0.1 deployment ---------");
         console.log("Admin           ", d.admin);
         console.log("Fee recipient   ", d.feeRecipient);
         console.log("BOUNTY          ", d.bounty, d.deployedMockBounty ? "(mock)" : "(preset)");
-        console.log("USDC            ", d.usdc,   d.deployedMockUSDC   ? "(mock)" : "(preset)");
+        console.log("USDC            ", d.usdc, d.deployedMockUSDC ? "(mock)" : "(preset)");
         console.log("BountyEscrow    ", d.escrow);
         console.log("VerdictModule   ", d.verdictModule);
         console.log("SettlementModule", d.settlementModule);
         console.log("-----------------------------------------------");
     }
 
-    function _writeJson(Deployment memory d) internal {
+    function _writeJson(
+        Deployment memory d
+    ) internal {
         string memory json = string.concat(
             "{\n",
-            '  "admin":            "', vm.toString(d.admin), '",\n',
-            '  "feeRecipient":     "', vm.toString(d.feeRecipient), '",\n',
-            '  "BOUNTY":           "', vm.toString(d.bounty), '",\n',
-            '  "USDC":             "', vm.toString(d.usdc), '",\n',
-            '  "BountyEscrow":     "', vm.toString(d.escrow), '",\n',
-            '  "VerdictModule":    "', vm.toString(d.verdictModule), '",\n',
-            '  "SettlementModule": "', vm.toString(d.settlementModule), '",\n',
-            '  "chainId":          ', vm.toString(block.chainid), ',\n',
-            '  "deployedMockBOUNTY": ', d.deployedMockBounty ? "true" : "false", ',\n',
-            '  "deployedMockUSDC":   ', d.deployedMockUSDC ? "true" : "false", "\n",
+            '  "admin":            "',
+            vm.toString(d.admin),
+            '",\n',
+            '  "feeRecipient":     "',
+            vm.toString(d.feeRecipient),
+            '",\n',
+            '  "BOUNTY":           "',
+            vm.toString(d.bounty),
+            '",\n',
+            '  "USDC":             "',
+            vm.toString(d.usdc),
+            '",\n',
+            '  "BountyEscrow":     "',
+            vm.toString(d.escrow),
+            '",\n',
+            '  "VerdictModule":    "',
+            vm.toString(d.verdictModule),
+            '",\n',
+            '  "SettlementModule": "',
+            vm.toString(d.settlementModule),
+            '",\n',
+            '  "chainId":          ',
+            vm.toString(block.chainid),
+            ",\n",
+            '  "deployedMockBOUNTY": ',
+            d.deployedMockBounty ? "true" : "false",
+            ",\n",
+            '  "deployedMockUSDC":   ',
+            d.deployedMockUSDC ? "true" : "false",
+            "\n",
             "}\n"
         );
         string memory path = string.concat("out/deployment-", vm.toString(block.chainid), ".json");

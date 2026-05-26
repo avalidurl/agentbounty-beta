@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-import {BaseTest} from "./Base.t.sol";
-import {IBountyEscrow} from "../src/interfaces/IBountyEscrow.sol";
-import {BountyEscrow} from "../src/BountyEscrow.sol";
+import { BountyEscrow } from "../src/BountyEscrow.sol";
+import { IBountyEscrow } from "../src/interfaces/IBountyEscrow.sol";
+import { BaseTest } from "./Base.t.sol";
 
 contract BountyEscrowTest is BaseTest {
     function test_createBounty_success() public {
@@ -29,31 +29,41 @@ contract BountyEscrowTest is BaseTest {
     function test_createBounty_revertsOnZeroPayout() public {
         vm.prank(sponsor);
         vm.expectRevert(BountyEscrow.InvalidPayoutMax.selector);
-        escrow.createBounty(0, DEFAULT_BASE_BOND, DEFAULT_REVIEW_WINDOW, DEFAULT_CHALLENGE_WINDOW, DEFAULT_SPEC_HASH, reviewer);
+        escrow.createBounty(
+            0, DEFAULT_BASE_BOND, DEFAULT_REVIEW_WINDOW, DEFAULT_CHALLENGE_WINDOW, DEFAULT_SPEC_HASH, reviewer
+        );
     }
 
     function test_createBounty_revertsOnZeroBaseBond() public {
         vm.prank(sponsor);
         vm.expectRevert(BountyEscrow.InvalidBaseBond.selector);
-        escrow.createBounty(DEFAULT_PAYOUT_MAX, 0, DEFAULT_REVIEW_WINDOW, DEFAULT_CHALLENGE_WINDOW, DEFAULT_SPEC_HASH, reviewer);
+        escrow.createBounty(
+            DEFAULT_PAYOUT_MAX, 0, DEFAULT_REVIEW_WINDOW, DEFAULT_CHALLENGE_WINDOW, DEFAULT_SPEC_HASH, reviewer
+        );
     }
 
     function test_createBounty_revertsOnExcessiveReviewWindow() public {
         vm.prank(sponsor);
         vm.expectRevert(BountyEscrow.InvalidReviewWindow.selector);
-        escrow.createBounty(DEFAULT_PAYOUT_MAX, DEFAULT_BASE_BOND, 15 days, DEFAULT_CHALLENGE_WINDOW, DEFAULT_SPEC_HASH, reviewer);
+        escrow.createBounty(
+            DEFAULT_PAYOUT_MAX, DEFAULT_BASE_BOND, 15 days, DEFAULT_CHALLENGE_WINDOW, DEFAULT_SPEC_HASH, reviewer
+        );
     }
 
     function test_createBounty_revertsOnExcessiveChallengeWindow() public {
         vm.prank(sponsor);
         vm.expectRevert(BountyEscrow.InvalidChallengeWindow.selector);
-        escrow.createBounty(DEFAULT_PAYOUT_MAX, DEFAULT_BASE_BOND, DEFAULT_REVIEW_WINDOW, 8 days, DEFAULT_SPEC_HASH, reviewer);
+        escrow.createBounty(
+            DEFAULT_PAYOUT_MAX, DEFAULT_BASE_BOND, DEFAULT_REVIEW_WINDOW, 8 days, DEFAULT_SPEC_HASH, reviewer
+        );
     }
 
     function test_createBounty_revertsOnEmptySpecHash() public {
         vm.prank(sponsor);
         vm.expectRevert(BountyEscrow.InvalidSpecHash.selector);
-        escrow.createBounty(DEFAULT_PAYOUT_MAX, DEFAULT_BASE_BOND, DEFAULT_REVIEW_WINDOW, DEFAULT_CHALLENGE_WINDOW, bytes32(0), reviewer);
+        escrow.createBounty(
+            DEFAULT_PAYOUT_MAX, DEFAULT_BASE_BOND, DEFAULT_REVIEW_WINDOW, DEFAULT_CHALLENGE_WINDOW, bytes32(0), reviewer
+        );
     }
 
     function test_fundBounty_transfersUSDC() public {

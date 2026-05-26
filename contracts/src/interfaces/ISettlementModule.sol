@@ -22,16 +22,19 @@ interface ISettlementModule {
     event HunterClaimed(uint256 indexed bountyId, address indexed hunter, uint256 amount);
     event SponsorRefunded(uint256 indexed bountyId, address indexed sponsor, uint256 amount);
     event VerdictAttested(
-        uint256 indexed bountyId,
-        address indexed reviewer,
-        uint256 winningSubmissionId,
-        bytes payload
+        uint256 indexed bountyId, address indexed reviewer, uint256 winningSubmissionId, bytes payload
     );
     event SponsorDiscountApplied(uint256 indexed bountyId, address indexed sponsor, uint256 effectiveFeeBps);
 
-    function settle(uint256 bountyId) external;
+    function settle(
+        uint256 bountyId
+    ) external;
 
-    function claim(uint256 bountyId) external;
+    function claim(
+        uint256 bountyId
+    ) external;
 
-    function refundSponsor(uint256 bountyId) external;
+    function refundSponsor(
+        uint256 bountyId
+    ) external;
 }

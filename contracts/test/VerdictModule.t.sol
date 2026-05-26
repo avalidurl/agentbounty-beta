@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-import {BaseTest} from "./Base.t.sol";
-import {IBountyEscrow} from "../src/interfaces/IBountyEscrow.sol";
-import {IVerdictModule} from "../src/interfaces/IVerdictModule.sol";
-import {VerdictModule} from "../src/VerdictModule.sol";
+import { VerdictModule } from "../src/VerdictModule.sol";
+import { IBountyEscrow } from "../src/interfaces/IBountyEscrow.sol";
+import { IVerdictModule } from "../src/interfaces/IVerdictModule.sol";
+import { BaseTest } from "./Base.t.sol";
 
 contract VerdictModuleTest is BaseTest {
     function test_registerReviewer_locksBOUNTY() public {
@@ -153,12 +153,7 @@ contract VerdictModuleTest is BaseTest {
 
         uint256[] memory slashed = new uint256[](0);
         (IVerdictModule.Verdict memory v, bytes memory sig) = _signVerdict(
-            reviewerKey,
-            bountyId,
-            sid,
-            slashed,
-            keccak256("evidence-anchor"),
-            verdictModule.reviewerNonce(reviewer)
+            reviewerKey, bountyId, sid, slashed, keccak256("evidence-anchor"), verdictModule.reviewerNonce(reviewer)
         );
 
         verdictModule.submitVerdict(v, sig);
@@ -176,9 +171,8 @@ contract VerdictModuleTest is BaseTest {
         uint256 sid = _submit(hunter1, bountyId);
 
         uint256[] memory slashed = new uint256[](0);
-        (IVerdictModule.Verdict memory v, bytes memory sig) = _signVerdict(
-            reviewerKey, bountyId, sid, slashed, keccak256("e"), 0
-        );
+        (IVerdictModule.Verdict memory v, bytes memory sig) =
+            _signVerdict(reviewerKey, bountyId, sid, slashed, keccak256("e"), 0);
 
         vm.warp(block.timestamp + 2 hours);
         vm.expectRevert(VerdictModule.VerdictExpired.selector);
@@ -192,9 +186,8 @@ contract VerdictModuleTest is BaseTest {
         uint256 sid = _submit(hunter1, bountyId);
 
         uint256[] memory slashed = new uint256[](0);
-        (IVerdictModule.Verdict memory v, bytes memory sig) = _signVerdict(
-            reviewerKey, bountyId, sid, slashed, keccak256("e"), 5
-        );
+        (IVerdictModule.Verdict memory v, bytes memory sig) =
+            _signVerdict(reviewerKey, bountyId, sid, slashed, keccak256("e"), 5);
 
         vm.expectRevert(VerdictModule.VerdictBadNonce.selector);
         verdictModule.submitVerdict(v, sig);
@@ -207,9 +200,8 @@ contract VerdictModuleTest is BaseTest {
         uint256 sid = _submit(hunter1, bountyId);
 
         uint256[] memory slashed = new uint256[](0);
-        (IVerdictModule.Verdict memory v, bytes memory sig) = _signVerdict(
-            reviewerKey2, bountyId, sid, slashed, keccak256("e"), 0
-        );
+        (IVerdictModule.Verdict memory v, bytes memory sig) =
+            _signVerdict(reviewerKey2, bountyId, sid, slashed, keccak256("e"), 0);
 
         vm.expectRevert(VerdictModule.VerdictBadSigner.selector);
         verdictModule.submitVerdict(v, sig);
@@ -226,9 +218,8 @@ contract VerdictModuleTest is BaseTest {
         uint256[] memory slashed = new uint256[](1);
         slashed[0] = sid3;
 
-        (IVerdictModule.Verdict memory v, bytes memory sig) = _signVerdict(
-            reviewerKey, bountyId, sid1, slashed, keccak256("e"), 0
-        );
+        (IVerdictModule.Verdict memory v, bytes memory sig) =
+            _signVerdict(reviewerKey, bountyId, sid1, slashed, keccak256("e"), 0);
         verdictModule.submitVerdict(v, sig);
 
         assertFalse(escrow.getSubmission(sid1).isSlashed);

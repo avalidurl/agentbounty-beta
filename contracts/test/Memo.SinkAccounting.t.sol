@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-import {BaseTest} from "./Base.t.sol";
-import {IBountyEscrow} from "../src/interfaces/IBountyEscrow.sol";
-import {IVerdictModule} from "../src/interfaces/IVerdictModule.sol";
+import { IBountyEscrow } from "../src/interfaces/IBountyEscrow.sol";
+import { IVerdictModule } from "../src/interfaces/IVerdictModule.sol";
+import { BaseTest } from "./Base.t.sol";
 
 /// @notice Memo invariant: BOUNTY at the burn address (0xdEaD) is
 ///         monotonically non-decreasing across the protocol's lifecycle,
@@ -40,9 +40,8 @@ contract MemoSinkAccountingTest is BaseTest {
 
         uint256[] memory slashed = new uint256[](1);
         slashed[0] = 3;
-        (IVerdictModule.Verdict memory v, bytes memory sig) = _signVerdict(
-            reviewerKey, bountyId, 1, slashed, keccak256("a"), 0
-        );
+        (IVerdictModule.Verdict memory v, bytes memory sig) =
+            _signVerdict(reviewerKey, bountyId, 1, slashed, keccak256("a"), 0);
         verdictModule.submitVerdict(v, sig);
         uint256 b5 = bounty.balanceOf(BURN);
         assertGe(b5, b4, "burn must not decrease at verdict");
@@ -65,9 +64,8 @@ contract MemoSinkAccountingTest is BaseTest {
 
         uint256[] memory slashed = new uint256[](1);
         slashed[0] = 2;
-        (IVerdictModule.Verdict memory v, bytes memory sig) = _signVerdict(
-            reviewerKey, bountyId, 1, slashed, keccak256("a"), 0
-        );
+        (IVerdictModule.Verdict memory v, bytes memory sig) =
+            _signVerdict(reviewerKey, bountyId, 1, slashed, keccak256("a"), 0);
         verdictModule.submitVerdict(v, sig);
         vm.warp(block.timestamp + DEFAULT_CHALLENGE_WINDOW + 1);
         settlementModule.settle(bountyId);
@@ -75,7 +73,9 @@ contract MemoSinkAccountingTest is BaseTest {
         uint256 burnedDelta = bounty.balanceOf(BURN);
         assertGt(burnedDelta, 0, "some BOUNTY must be at burn after settle");
 
-        assertEq(bounty.totalSupply(), totalBefore, "ERC20 totalSupply unchanged; effective supply tracked via burn balance");
+        assertEq(
+            bounty.totalSupply(), totalBefore, "ERC20 totalSupply unchanged; effective supply tracked via burn balance"
+        );
     }
 
     function test_invariant_burnNeverShrinks_underRefund() public {
@@ -89,9 +89,8 @@ contract MemoSinkAccountingTest is BaseTest {
         assertGe(bMid, b0);
 
         uint256[] memory empty = new uint256[](0);
-        (IVerdictModule.Verdict memory v, bytes memory sig) = _signVerdict(
-            reviewerKey, bountyId, 0, empty, keccak256("rejectall"), 0
-        );
+        (IVerdictModule.Verdict memory v, bytes memory sig) =
+            _signVerdict(reviewerKey, bountyId, 0, empty, keccak256("rejectall"), 0);
         verdictModule.submitVerdict(v, sig);
         vm.warp(block.timestamp + DEFAULT_CHALLENGE_WINDOW + 1);
         settlementModule.settle(bountyId);

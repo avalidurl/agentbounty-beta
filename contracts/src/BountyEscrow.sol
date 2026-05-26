@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-import {AccessControl} from "@openzeppelin/contracts/access/AccessControl.sol";
-import {Pausable} from "@openzeppelin/contracts/utils/Pausable.sol";
-import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import { AccessControl } from "@openzeppelin/contracts/access/AccessControl.sol";
+import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import { SafeERC20 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import { Pausable } from "@openzeppelin/contracts/utils/Pausable.sol";
+import { ReentrancyGuard } from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
-import {IBountyEscrow} from "./interfaces/IBountyEscrow.sol";
+import { IBountyEscrow } from "./interfaces/IBountyEscrow.sol";
 
 /// @title BountyEscrow
 /// @notice Holds USDC for funded bounties, custodies BOUNTY bonds for
@@ -25,15 +25,15 @@ contract BountyEscrow is AccessControl, Pausable, ReentrancyGuard, IBountyEscrow
     bytes32 public constant SETTLEMENT_MODULE_ROLE = keccak256("SETTLEMENT_MODULE_ROLE");
     bytes32 public constant DISPUTE_RESOLVER_ROLE = keccak256("DISPUTE_RESOLVER_ROLE");
 
-    uint64  public constant MAX_REVIEW_WINDOW       = 14 days;
-    uint64  public constant MAX_CHALLENGE_WINDOW    = 7 days;
-    uint64  public constant REFUND_AFTER            = 30 days;
-    uint64  public constant REVIEWER_REJECT_WINDOW  = 12 hours;
-    uint256 public constant BOND_MULTIPLIER_BPS     = 12_500;
-    uint256 public constant BOND_CAP_MULTIPLIER     = 10;
-    uint256 public constant MAX_SUBMISSIONS         = 50;
-    uint256 public constant BPS_DENOMINATOR         = 10_000;
-    address public constant BURN_ADDRESS            = address(0xdEaD);
+    uint64 public constant MAX_REVIEW_WINDOW = 14 days;
+    uint64 public constant MAX_CHALLENGE_WINDOW = 7 days;
+    uint64 public constant REFUND_AFTER = 30 days;
+    uint64 public constant REVIEWER_REJECT_WINDOW = 12 hours;
+    uint256 public constant BOND_MULTIPLIER_BPS = 12_500;
+    uint256 public constant BOND_CAP_MULTIPLIER = 10;
+    uint256 public constant MAX_SUBMISSIONS = 50;
+    uint256 public constant BPS_DENOMINATOR = 10_000;
+    address public constant BURN_ADDRESS = address(0xdEaD);
 
     IERC20 public immutable BOUNTY;
     IERC20 public immutable USDC;
@@ -41,11 +41,11 @@ contract BountyEscrow is AccessControl, Pausable, ReentrancyGuard, IBountyEscrow
     address public feeRecipient;
     address public challengeContract;
 
-    mapping(uint256 => Bounty)     internal _bounties;
+    mapping(uint256 => Bounty) internal _bounties;
     mapping(uint256 => Submission) internal _submissions;
-    mapping(uint256 => uint256)    internal _currentMultiplierBps;
-    mapping(uint256 => bool)       internal _disputeResolved;
-    mapping(uint256 => bool)       internal _disputeAwardHunter;
+    mapping(uint256 => uint256) internal _currentMultiplierBps;
+    mapping(uint256 => bool) internal _disputeResolved;
+    mapping(uint256 => bool) internal _disputeAwardHunter;
     uint256 public nextBountyId;
     uint256 public nextSubmissionId;
 
@@ -76,7 +76,10 @@ contract BountyEscrow is AccessControl, Pausable, ReentrancyGuard, IBountyEscrow
         address usdcToken,
         address initialFeeRecipient
     ) {
-        if (admin == address(0) || bountyToken == address(0) || usdcToken == address(0) || initialFeeRecipient == address(0)) {
+        if (
+            admin == address(0) || bountyToken == address(0) || usdcToken == address(0)
+                || initialFeeRecipient == address(0)
+        ) {
             revert ZeroAddress();
         }
         BOUNTY = IERC20(bountyToken);
@@ -88,12 +91,16 @@ contract BountyEscrow is AccessControl, Pausable, ReentrancyGuard, IBountyEscrow
         _grantRole(DISPUTE_RESOLVER_ROLE, admin);
     }
 
-    function setFeeRecipient(address newRecipient) external onlyRole(DEFAULT_ADMIN_ROLE) {
+    function setFeeRecipient(
+        address newRecipient
+    ) external onlyRole(DEFAULT_ADMIN_ROLE) {
         if (newRecipient == address(0)) revert ZeroAddress();
         feeRecipient = newRecipient;
     }
 
-    function setChallengeContract(address newChallengeContract) external onlyRole(DEFAULT_ADMIN_ROLE) {
+    function setChallengeContract(
+        address newChallengeContract
+    ) external onlyRole(DEFAULT_ADMIN_ROLE) {
         challengeContract = newChallengeContract;
     }
 
@@ -108,8 +115,8 @@ contract BountyEscrow is AccessControl, Pausable, ReentrancyGuard, IBountyEscrow
     function createBounty(
         uint256 payoutMax,
         uint256 baseBond,
-        uint64  reviewWindow,
-        uint64  challengeWindow,
+        uint64 reviewWindow,
+        uint64 challengeWindow,
         bytes32 specHash,
         address proposedReviewer
     ) external whenNotPaused returns (uint256 bountyId) {
@@ -136,7 +143,9 @@ contract BountyEscrow is AccessControl, Pausable, ReentrancyGuard, IBountyEscrow
         emit BountyCreated(bountyId, msg.sender, proposedReviewer, payoutMax, baseBond, specHash);
     }
 
-    function fundBounty(uint256 bountyId) external nonReentrant whenNotPaused {
+    function fundBounty(
+        uint256 bountyId
+    ) external nonReentrant whenNotPaused {
         Bounty storage b = _bounties[bountyId];
         if (b.sponsor == address(0)) revert BountyDoesNotExist();
         if (b.state != BountyState.Draft) revert WrongState();
@@ -151,7 +160,9 @@ contract BountyEscrow is AccessControl, Pausable, ReentrancyGuard, IBountyEscrow
         emit BountyFunded(bountyId, b.payoutMax);
     }
 
-    function cancel(uint256 bountyId) external nonReentrant whenNotPaused {
+    function cancel(
+        uint256 bountyId
+    ) external nonReentrant whenNotPaused {
         Bounty storage b = _bounties[bountyId];
         if (b.sponsor == address(0)) revert BountyDoesNotExist();
         if (b.state != BountyState.Funded) revert WrongState();
@@ -165,7 +176,9 @@ contract BountyEscrow is AccessControl, Pausable, ReentrancyGuard, IBountyEscrow
         emit BountyRefunded(bountyId, b.payoutMax);
     }
 
-    function refund(uint256 bountyId) external nonReentrant whenNotPaused {
+    function refund(
+        uint256 bountyId
+    ) external nonReentrant whenNotPaused {
         Bounty storage b = _bounties[bountyId];
         if (b.sponsor == address(0)) revert BountyDoesNotExist();
         if (b.state != BountyState.Funded && b.state != BountyState.InReview) revert WrongState();
@@ -217,7 +230,9 @@ contract BountyEscrow is AccessControl, Pausable, ReentrancyGuard, IBountyEscrow
         emit SubmissionCreated(bountyId, submissionId, msg.sender, b.baseBond, burnAmount, artifactHash);
     }
 
-    function dispute(uint256 bountyId) external nonReentrant whenNotPaused {
+    function dispute(
+        uint256 bountyId
+    ) external nonReentrant whenNotPaused {
         Bounty storage b = _bounties[bountyId];
         if (b.sponsor == address(0)) revert BountyDoesNotExist();
         if (b.state != BountyState.Queued) revert WrongState();
@@ -227,7 +242,10 @@ contract BountyEscrow is AccessControl, Pausable, ReentrancyGuard, IBountyEscrow
         emit Disputed(bountyId, msg.sender, 0);
     }
 
-    function resolveDispute(uint256 bountyId, bool awardHunter) external onlyRole(DISPUTE_RESOLVER_ROLE) {
+    function resolveDispute(
+        uint256 bountyId,
+        bool awardHunter
+    ) external onlyRole(DISPUTE_RESOLVER_ROLE) {
         Bounty storage b = _bounties[bountyId];
         if (b.sponsor == address(0)) revert BountyDoesNotExist();
         if (b.state != BountyState.Disputed) revert WrongState();
@@ -239,7 +257,10 @@ contract BountyEscrow is AccessControl, Pausable, ReentrancyGuard, IBountyEscrow
         emit DisputeResolved(bountyId, awardHunter);
     }
 
-    function markAssigned(uint256 bountyId, address reviewer) external onlyRole(VERDICT_MODULE_ROLE) {
+    function markAssigned(
+        uint256 bountyId,
+        address reviewer
+    ) external onlyRole(VERDICT_MODULE_ROLE) {
         Bounty storage b = _bounties[bountyId];
         if (b.sponsor == address(0)) revert BountyDoesNotExist();
         if (b.state != BountyState.Funded) revert WrongState();
@@ -250,7 +271,9 @@ contract BountyEscrow is AccessControl, Pausable, ReentrancyGuard, IBountyEscrow
         emit ReviewerAssigned(bountyId, reviewer);
     }
 
-    function markRejectedAndPooled(uint256 bountyId) external onlyRole(VERDICT_MODULE_ROLE) {
+    function markRejectedAndPooled(
+        uint256 bountyId
+    ) external onlyRole(VERDICT_MODULE_ROLE) {
         Bounty storage b = _bounties[bountyId];
         if (b.sponsor == address(0)) revert BountyDoesNotExist();
         if (b.state != BountyState.Funded) revert WrongState();
@@ -291,7 +314,9 @@ contract BountyEscrow is AccessControl, Pausable, ReentrancyGuard, IBountyEscrow
         emit VerdictRecorded(bountyId, winningSubmissionId, slashedSubmissionIds, evidenceAnchor);
     }
 
-    function markSettled(uint256 bountyId) external onlyRole(SETTLEMENT_MODULE_ROLE) {
+    function markSettled(
+        uint256 bountyId
+    ) external onlyRole(SETTLEMENT_MODULE_ROLE) {
         Bounty storage b = _bounties[bountyId];
         if (b.sponsor == address(0)) revert BountyDoesNotExist();
         if (b.state != BountyState.Queued) revert WrongState();
@@ -300,7 +325,9 @@ contract BountyEscrow is AccessControl, Pausable, ReentrancyGuard, IBountyEscrow
         emit BountySettled(bountyId);
     }
 
-    function markClaimed(uint256 bountyId) external onlyRole(SETTLEMENT_MODULE_ROLE) {
+    function markClaimed(
+        uint256 bountyId
+    ) external onlyRole(SETTLEMENT_MODULE_ROLE) {
         Bounty storage b = _bounties[bountyId];
         if (b.sponsor == address(0)) revert BountyDoesNotExist();
         if (b.state != BountyState.Settled) revert WrongState();
@@ -314,7 +341,9 @@ contract BountyEscrow is AccessControl, Pausable, ReentrancyGuard, IBountyEscrow
         emit BountyClaimed(bountyId, hunter);
     }
 
-    function markRefundedFromQueued(uint256 bountyId) external onlyRole(SETTLEMENT_MODULE_ROLE) {
+    function markRefundedFromQueued(
+        uint256 bountyId
+    ) external onlyRole(SETTLEMENT_MODULE_ROLE) {
         Bounty storage b = _bounties[bountyId];
         if (b.sponsor == address(0)) revert BountyDoesNotExist();
         if (b.state != BountyState.Queued) revert WrongState();
@@ -327,49 +356,65 @@ contract BountyEscrow is AccessControl, Pausable, ReentrancyGuard, IBountyEscrow
         emit BountyRefunded(bountyId, b.payoutMax);
     }
 
-    function withdrawUSDC(address to, uint256 amount) external onlyRole(SETTLEMENT_MODULE_ROLE) {
+    function withdrawUSDC(
+        address to,
+        uint256 amount
+    ) external onlyRole(SETTLEMENT_MODULE_ROLE) {
         if (to == address(0)) revert ZeroAddress();
         if (USDC.balanceOf(address(this)) < amount) revert InsufficientUSDCBalance();
         USDC.safeTransfer(to, amount);
     }
 
-    function withdrawBounty(address to, uint256 amount) external onlyRole(SETTLEMENT_MODULE_ROLE) {
+    function withdrawBounty(
+        address to,
+        uint256 amount
+    ) external onlyRole(SETTLEMENT_MODULE_ROLE) {
         if (to == address(0)) revert ZeroAddress();
         if (BOUNTY.balanceOf(address(this)) < amount) revert InsufficientBountyBalance();
         BOUNTY.safeTransfer(to, amount);
     }
 
-    function withdrawBountyToBurn(uint256 amount) external onlyRole(SETTLEMENT_MODULE_ROLE) {
+    function withdrawBountyToBurn(
+        uint256 amount
+    ) external onlyRole(SETTLEMENT_MODULE_ROLE) {
         if (BOUNTY.balanceOf(address(this)) < amount) revert InsufficientBountyBalance();
         BOUNTY.safeTransfer(BURN_ADDRESS, amount);
     }
 
-    function getBounty(uint256 bountyId) external view returns (Bounty memory) {
+    function getBounty(
+        uint256 bountyId
+    ) external view returns (Bounty memory) {
         return _bounties[bountyId];
     }
 
-    function getSubmission(uint256 submissionId) external view returns (Submission memory) {
+    function getSubmission(
+        uint256 submissionId
+    ) external view returns (Submission memory) {
         return _submissions[submissionId];
     }
 
-    function getSubmissionIds(uint256 bountyId) external view returns (uint256[] memory) {
+    function getSubmissionIds(
+        uint256 bountyId
+    ) external view returns (uint256[] memory) {
         return _bounties[bountyId].submissionIds;
     }
 
-    function bountyExists(uint256 bountyId) external view returns (bool) {
+    function bountyExists(
+        uint256 bountyId
+    ) external view returns (bool) {
         return _bounties[bountyId].sponsor != address(0);
     }
 
-    function getCurrentMultiplierBps(uint256 bountyId) external view returns (uint256) {
+    function getCurrentMultiplierBps(
+        uint256 bountyId
+    ) external view returns (uint256) {
         uint256 m = _currentMultiplierBps[bountyId];
         return m == 0 ? BPS_DENOMINATOR : m;
     }
 
-    function currentBondCost(uint256 bountyId)
-        external
-        view
-        returns (uint256 totalCost, uint256 baseBond, uint256 burnAmount)
-    {
+    function currentBondCost(
+        uint256 bountyId
+    ) external view returns (uint256 totalCost, uint256 baseBond, uint256 burnAmount) {
         Bounty storage b = _bounties[bountyId];
         baseBond = b.baseBond;
         uint256 multiplierBps = _currentMultiplierBps[bountyId];
@@ -378,7 +423,9 @@ contract BountyEscrow is AccessControl, Pausable, ReentrancyGuard, IBountyEscrow
         burnAmount = totalCost - baseBond;
     }
 
-    function disputeResolved(uint256 bountyId) external view returns (bool resolved, bool awardHunter) {
+    function disputeResolved(
+        uint256 bountyId
+    ) external view returns (bool resolved, bool awardHunter) {
         return (_disputeResolved[bountyId], _disputeAwardHunter[bountyId]);
     }
 }

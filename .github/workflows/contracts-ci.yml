@@ -1,0 +1,72 @@
+name: contracts-ci
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "contracts/**"
+      - ".github/workflows/contracts-ci.yml"
+  pull_request:
+    paths:
+      - "contracts/**"
+      - ".github/workflows/contracts-ci.yml"
+  workflow_dispatch:
+
+env:
+  FOUNDRY_PROFILE: ci
+
+jobs:
+  forge:
+    name: forge build / test / coverage
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: contracts
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: stable
+
+      - name: Foundry version
+        run: |
+          forge --version
+          cast --version
+
+      - name: Build
+        run: forge build --sizes
+
+      - name: Format check
+        run: forge fmt --check
+
+      - name: Test
+        env:
+          FOUNDRY_PROFILE: default
+        run: forge test -vv
+
+      - name: Coverage
+        run: |
+          forge coverage --ir-minimum --report summary --no-match-coverage "test/" \
+            | tee coverage-summary.txt
+
+      - name: Coverage gate
+        run: |
+          set -euo pipefail
+          line_pct=$(grep -E "^\| Total " coverage-summary.txt | awk -F'|' '{print $3}' | sed -E 's/[^0-9.]//g')
+          echo "Total line coverage: ${line_pct}%"
+          awk -v p="$line_pct" 'BEGIN { exit (p+0 >= 90) ? 0 : 1 }' \
+            || (echo "Coverage ${line_pct}% is below the 90% gate" && exit 1)
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-summary
+          path: contracts/coverage-summary.txt
+          if-no-files-found: warn

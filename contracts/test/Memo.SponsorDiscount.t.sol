@@ -1,25 +1,26 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-import {BaseTest} from "./Base.t.sol";
-import {IBountyEscrow} from "../src/interfaces/IBountyEscrow.sol";
-import {IVerdictModule} from "../src/interfaces/IVerdictModule.sol";
-import {SettlementModule} from "../src/SettlementModule.sol";
+import { SettlementModule } from "../src/SettlementModule.sol";
+import { IBountyEscrow } from "../src/interfaces/IBountyEscrow.sol";
+import { IVerdictModule } from "../src/interfaces/IVerdictModule.sol";
+import { BaseTest } from "./Base.t.sol";
 
 /// @notice Memo invariant: sponsor BOUNTY discount is admin-flippable and
 ///         applied at settlement based on sponsor's BOUNTY balance at the
 ///         moment of settle().
 contract MemoSponsorDiscountTest is BaseTest {
-    function _runBountyAndCaptureFee(address theSponsor) internal returns (uint256 hunterPayout) {
+    function _runBountyAndCaptureFee(
+        address theSponsor
+    ) internal returns (uint256 hunterPayout) {
         uint256 bountyId = _createAndFund(theSponsor, reviewer, DEFAULT_PAYOUT_MAX, DEFAULT_BASE_BOND);
         _registerReviewer(reviewer, MIN_REVIEWER_BOND);
         _acceptAssignment(reviewer, bountyId);
         uint256 sid = _submit(hunter1, bountyId);
 
         uint256[] memory empty = new uint256[](0);
-        (IVerdictModule.Verdict memory v, bytes memory sig) = _signVerdict(
-            reviewerKey, bountyId, sid, empty, keccak256("a"), 0
-        );
+        (IVerdictModule.Verdict memory v, bytes memory sig) =
+            _signVerdict(reviewerKey, bountyId, sid, empty, keccak256("a"), 0);
         verdictModule.submitVerdict(v, sig);
         vm.warp(block.timestamp + DEFAULT_CHALLENGE_WINDOW + 1);
         settlementModule.settle(bountyId);

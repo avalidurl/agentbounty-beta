@@ -1,15 +1,15 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-import {Test} from "forge-std/Test.sol";
+import { Test } from "forge-std/Test.sol";
 
-import {MockBOUNTY} from "../src/MockBOUNTY.sol";
-import {MockUSDC} from "../src/MockUSDC.sol";
-import {BountyEscrow} from "../src/BountyEscrow.sol";
-import {VerdictModule} from "../src/VerdictModule.sol";
-import {SettlementModule} from "../src/SettlementModule.sol";
-import {IBountyEscrow} from "../src/interfaces/IBountyEscrow.sol";
-import {IVerdictModule} from "../src/interfaces/IVerdictModule.sol";
+import { BountyEscrow } from "../src/BountyEscrow.sol";
+import { MockBOUNTY } from "../src/MockBOUNTY.sol";
+import { MockUSDC } from "../src/MockUSDC.sol";
+import { SettlementModule } from "../src/SettlementModule.sol";
+import { VerdictModule } from "../src/VerdictModule.sol";
+import { IBountyEscrow } from "../src/interfaces/IBountyEscrow.sol";
+import { IVerdictModule } from "../src/interfaces/IVerdictModule.sol";
 
 /// @notice Base test scaffolding: deploys the full contract suite, mints
 ///         test tokens to canonical actors, and wires roles so tests can
@@ -38,10 +38,10 @@ abstract contract BaseTest is Test {
     address internal challenger = makeAddr("challenger");
 
     uint256 internal constant MIN_REVIEWER_BOND = 1_000_000 ether;
-    uint256 internal constant DEFAULT_PAYOUT_MAX = 1_000 * 10 ** 6;
+    uint256 internal constant DEFAULT_PAYOUT_MAX = 1000 * 10 ** 6;
     uint256 internal constant DEFAULT_BASE_BOND = 100 ether;
-    uint64  internal constant DEFAULT_REVIEW_WINDOW = 7 days;
-    uint64  internal constant DEFAULT_CHALLENGE_WINDOW = 1 days;
+    uint64 internal constant DEFAULT_REVIEW_WINDOW = 7 days;
+    uint64 internal constant DEFAULT_CHALLENGE_WINDOW = 1 days;
     bytes32 internal constant DEFAULT_SPEC_HASH = keccak256("spec://test/v1");
 
     function setUp() public virtual {
@@ -85,31 +85,35 @@ abstract contract BaseTest is Test {
     ) internal returns (uint256 bountyId) {
         vm.startPrank(bountySponsor);
         bountyId = escrow.createBounty(
-            payoutMax,
-            baseBond,
-            DEFAULT_REVIEW_WINDOW,
-            DEFAULT_CHALLENGE_WINDOW,
-            DEFAULT_SPEC_HASH,
-            proposedReviewer
+            payoutMax, baseBond, DEFAULT_REVIEW_WINDOW, DEFAULT_CHALLENGE_WINDOW, DEFAULT_SPEC_HASH, proposedReviewer
         );
         usdc.approve(address(escrow), payoutMax);
         escrow.fundBounty(bountyId);
         vm.stopPrank();
     }
 
-    function _registerReviewer(address reviewerAddr, uint256 bondAmount) internal {
+    function _registerReviewer(
+        address reviewerAddr,
+        uint256 bondAmount
+    ) internal {
         vm.startPrank(reviewerAddr);
         bounty.approve(address(verdictModule), bondAmount);
         verdictModule.registerReviewer(bondAmount);
         vm.stopPrank();
     }
 
-    function _acceptAssignment(address reviewerAddr, uint256 bountyId) internal {
+    function _acceptAssignment(
+        address reviewerAddr,
+        uint256 bountyId
+    ) internal {
         vm.prank(reviewerAddr);
         verdictModule.acceptAssignment(bountyId);
     }
 
-    function _submit(address hunter, uint256 bountyId) internal returns (uint256 submissionId) {
+    function _submit(
+        address hunter,
+        uint256 bountyId
+    ) internal returns (uint256 submissionId) {
         (uint256 totalCost,,) = escrow.currentBondCost(bountyId);
         vm.startPrank(hunter);
         bounty.approve(address(escrow), totalCost);
@@ -140,17 +144,18 @@ abstract contract BaseTest is Test {
         sig = _signedVerdictDigest(reviewerPrivKey, v);
     }
 
-    function _signedVerdictDigest(uint256 reviewerPrivKey, IVerdictModule.Verdict memory v)
-        internal
-        view
-        returns (bytes memory)
-    {
+    function _signedVerdictDigest(
+        uint256 reviewerPrivKey,
+        IVerdictModule.Verdict memory v
+    ) internal view returns (bytes memory) {
         bytes32 digest = _verdictDigest(v);
         (uint8 vSig, bytes32 r, bytes32 s) = vm.sign(reviewerPrivKey, digest);
         return abi.encodePacked(r, s, vSig);
     }
 
-    function _verdictDigest(IVerdictModule.Verdict memory v) internal view returns (bytes32) {
+    function _verdictDigest(
+        IVerdictModule.Verdict memory v
+    ) internal view returns (bytes32) {
         bytes32 structHash = keccak256(
             abi.encode(
                 verdictModule.verdictTypehash(),

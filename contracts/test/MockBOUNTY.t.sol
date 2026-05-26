@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-import {Test} from "forge-std/Test.sol";
-import {MockBOUNTY} from "../src/MockBOUNTY.sol";
+import { MockBOUNTY } from "../src/MockBOUNTY.sol";
+import { Test } from "forge-std/Test.sol";
 
 contract MockBOUNTYTest is Test {
     MockBOUNTY internal token;
@@ -22,20 +22,20 @@ contract MockBOUNTYTest is Test {
 
     function test_owner_canMint() public {
         vm.prank(owner);
-        token.mint(alice, 1_000 ether);
-        assertEq(token.balanceOf(alice), 1_000 ether);
-        assertEq(token.totalSupply(), 1_000 ether);
+        token.mint(alice, 1000 ether);
+        assertEq(token.balanceOf(alice), 1000 ether);
+        assertEq(token.totalSupply(), 1000 ether);
     }
 
     function test_nonOwner_cannotMint() public {
         vm.prank(alice);
         vm.expectRevert();
-        token.mint(alice, 1_000 ether);
+        token.mint(alice, 1000 ether);
     }
 
     function test_transfer() public {
         vm.prank(owner);
-        token.mint(alice, 1_000 ether);
+        token.mint(alice, 1000 ether);
 
         vm.prank(alice);
         bool ok = token.transfer(bob, 250 ether);
@@ -46,7 +46,7 @@ contract MockBOUNTYTest is Test {
 
     function test_burnableByHolder() public {
         vm.prank(owner);
-        token.mint(alice, 1_000 ether);
+        token.mint(alice, 1000 ether);
 
         vm.prank(alice);
         token.burn(400 ether);
