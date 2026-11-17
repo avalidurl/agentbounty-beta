@@ -15,6 +15,10 @@ on:
 env:
   FOUNDRY_PROFILE: ci
 
+permissions:
+  contents: read
+  actions: write
+
 jobs:
   forge:
     name: forge build / test / coverage
